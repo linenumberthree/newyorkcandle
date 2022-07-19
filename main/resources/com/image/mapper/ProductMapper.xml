@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	<mapper namespace="com.image.mapper.ProductMapper">
+	<resultMap type="ProductDto" id="productMap">
+		<id property="productNo" column="productNo"/>
+		<result property="candleName" column="candleName"/>
+		<result property="scentName" column="scentName"/>
+		<result property="effectName" column="effectName"/>
+		<result property="placeName" column="placeName"/>
+		<result property="optionPrice" column="optionPrice"/>
+		<result property="productDate" column="productDate"/>
+	</resultMap>
+	<select id="getAllProducts" resultMap="productMap">
+		select candle.*, 
+			(select scentName from candleScent where candle.scentNo=candleScent.scentNo) as `scentName`, 
+			(select effectName from candleEffect where candle.effectNo=candleEffect.effectNo) as `effectName`, 
+			(select placeName from candlePlace where candle.placeNo=candlePlace.placeNo) as `placeName`, 
+			(select optionPrice from candleOption where candle.productNo=candleOption.productNo and candleOption.optionName='S') as `optionPrice` 
+		from candle order by productNo
+	</select>
+	<select id="getOptionPrice" resultType="int">
+		select o.optionPrice as `optionPrice` from candleOption as `o` join candle as `c` on o.productNo=c.productNo where o.optionName= #{optionName} and c.productNo= #{productNo}
+	</select>
+	<select id="getDetail" resultMap="productMap">
+		select c.*, e.effectName, s.scentName, p.placeName, o.optionName, o.optionPrice from candle `c` left join candleEffect `e` on c.effectNo=e.effectNo
+    		left join candleScent `s` on c.scentNo=s.scentNo
+    		left join candlePlace `p` on c.placeNo=p.placeNo
+   			left join candleOption `o` on c.productNo=o.productNo and o.optionName='S'
+		where c.productNo=#{productNo};
+	</select>
+	<select id="count" resultType="int">
+		select count(*) from candle
+	</select>
+	<select id="listPage" resultMap="productMap">
+		select candle.*, 
+			(select scentName from candleScent where candle.scentNo=candleScent.scentNo) as `scentName`, 
+			(select effectName from candleEffect where candle.effectNo=candleEffect.effectNo) as `effectName`, 
+			(select placeName from candlePlace where candle.placeNo=candlePlace.placeNo) as `placeName`, 
+			(select optionPrice from candleOption where candle.productNo=candleOption.productNo and candleOption.optionName='S') as `optionPrice` 
+		from candle order by productNo limit #{page}, 10
+	</select>
+	<insert id="insertProduct" parameterType="com.image.dto.ProductDto">
+		insert into candle (candleName, scentNo, effectNo, placeNo, adminNo, adminIp) values (#{candleName}, #{scentNo}, #{effectNo}, #{placeNo}, #{adminNo}, #{adminIp});
+	</insert>
+	<insert id="insertProductOption" parameterType="String">
+		insert into candleOption (productNo, optionName, optionPrice) values 
+			((select productNo from candle where candleName=#{candleName}), 'S', 10000), 
+			((select productNo from candle where candleName=#{candleName}), 'M', 15000), 
+			((select productNo from candle where candleName=#{candleName}), 'L', 18000)
+	</insert>
+	<select id="getProductNo" resultType="int">
+		select productNo from candle where candleName=#{candleName};
+	</select>
+	<update id="addFiles" parameterType="com.image.dto.ProductDto">
+		update candle set thumbnailImg=#{thumbnailImg}, detailImg=#{detailImg} where productNo=#{productNo};
+	</update>
+	<delete id="deleteProduct" parameterType="com.image.dto.ProductDto">
+		delete from candle where productNo=#{productNo};
+	</delete>
+	<delete id="deleteProductOption" parameterType="com.image.dto.ProductDto">
+		delete from candleOption where productNo=#{productNo};
+	</delete>
+	<update id="updateProduct" parameterType="com.image.dto.ProductDto">
+		update candle set candleName=#{candleName}, scentNo=#{scentNo}, effectNo=#{effectNo}, placeNo=#{placeNo}, thumbnailImg=#{thumbnailImg}, detailImg=#{detailImg} where productNo=#{productNo};
+	</update>
+	</mapper>

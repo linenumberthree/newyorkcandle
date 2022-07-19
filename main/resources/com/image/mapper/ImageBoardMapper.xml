@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.image.mapper.ImageBoardMapper">
+	<select id="selectAll" resultType="com.image.dto.ImageBoardDto">
+		select * from board order by bno desc
+	</select>
+	<insert id="insert" parameterType="com.image.dto.ImageBoardDto">
+		insert into board (bname, btitle, bcontent, bpass, bfile, bip) values (#{bname}, #{btitle}, #{bcontent}, #{bpass}, #{bfile}, #{bip})
+	</insert>
+	<select id="selectOne" resultType="com.image.dto.ImageBoardDto">
+		select * from board where bno= #{bno}
+	</select>
+	<update id="updateHit" parameterType="com.image.dto.ImageBoardDto">
+		update board set bhit=bhit+1 where bno=#{bno}
+	</update>
+	<update id="update" parameterType="com.image.dto.ImageBoardDto">
+		update board set bname=#{bname}, btitle=#{btitle}, bcontent=#{bcontent}, bfile=#{bfile} where bno=#{bno} and bpass=#{bpass};
+	</update>
+	<delete id="delete" parameterType="com.image.dto.ImageBoardDto">
+		delete from board where bno=#{bno} and bpass=#{bpass}
+	</delete>
+	<select id="listPage" resultType="com.image.dto.ImageBoardDto">
+		select * from board order by bno desc limit #{start}, 10
+	</select>
+	<select id="count" resultType="int">
+		select count(*) from board
+	</select>
+</mapper>

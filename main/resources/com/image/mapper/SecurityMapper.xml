@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	<mapper namespace="com.image.mapper.SecurityMapper">
+	<!-- ResultMap -->
+	<resultMap type="UserDto" id="userMap">
+		<id property="userno" column="adminNo"/>
+		<result property="userid" column="adminId"/>
+		<result property="userpw" column="adminPw"/>
+		<result property="userip" column="adminIp"/>
+		<result property="username" column="adminName"/>
+		<collection property="authList" resultMap="authMap"/>
+	</resultMap>
+	<resultMap type="String" id="authMap">
+		<result property="auth" column="adminAuth"/>
+	</resultMap>
+	<select id="read_security" resultMap="userMap">
+		select adminNo, adminId, adminPw, adminName, adminAuth from admin where adminId=#{id};
+	</select>
+	<select id="read_security_by_no" resultMap="userMap">
+		select adminNo, adminId, adminPw, adminName, adminAuth from admin where adminNo=#{adminNo};
+	</select>
+	<insert id="joinNew" parameterType="com.image.dto.UserDto">
+		insert into admin (adminId, adminPw, adminName, adminIp) values (#{userid}, #{userpw}, #{username}, #{userip});
+	</insert>
+	<select id="checkDupId" resultType="int">
+		select count(*) from admin where adminId=#{id};
+	</select>
+	</mapper>

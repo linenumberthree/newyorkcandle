@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:security="http://www.springframework.org/schema/security"
+		xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+			http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		
+		
+		<bean id="successHandler" class="com.image.security.LoginSuccessHandler"/>
+		<bean id="deniedHandler" class="com.image.security.DeniedHandler"/>
+		<bean id="customUserDetails" class="com.image.security.CustomUserDetailsService"/>
+		<bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+		
+		<security:http>
+			<security:intercept-url pattern="/imageBoard/*" access="permitAll()"/>
+			<security:intercept-url pattern="/product/*" access="isAuthenticated()"/>
+			<security:intercept-url pattern="/security/checkPw" access="isAuthenticated()"/>
+			<security:form-login login-page="/security/login" authentication-success-handler-ref="successHandler"/>
+			<security:access-denied-handler ref="deniedHandler"/>
+		</security:http>
+		
+		<security:authentication-manager>
+			<security:authentication-provider user-service-ref="customUserDetails">
+				<security:password-encoder ref="bCryptPasswordEncoder"/>
+			</security:authentication-provider>
+		</security:authentication-manager>
+</beans>
+	
